@@ -1,0 +1,61 @@
+function testEnviarEmails() {
+  // Copy of your original function with test modifications
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var rango = hoja.getDataRange();
+  var valores = rango.getValues();
+  var correoBcc = "mdipeco@aisenson.com.ar";
+
+  var batchSize = 50;
+  var recipients = [];
+  
+  // Get all recipients from spreadsheet 
+  for (var i = 1; i < valores.length; i++) {  
+    var nombre = valores[i][0];
+    var correo = valores[i][3];
+    recipients.push({nombre: nombre, correo: correo});  
+  }
+  
+  var asunto = "[TEST] Fecha de entrega concurso de estudiantes AISENSON - asnNoise";
+  
+  // Log total recipients for verification
+  Logger.log("Total recipients: " + recipients.length);
+  
+  // Instead of sending real emails, just log what would be sent
+  for (var i = 0; i < recipients.length; i += batchSize) {
+    var batch = recipients.slice(i, i + batchSize);
+    
+    Logger.log("--- BATCH " + (Math.floor(i/batchSize) + 1) + " ---");
+    Logger.log("Batch size: " + batch.length);
+    
+    batch.forEach(function(participant, index) {
+      var mensajeHTML = `<p>Hola ${participant.nombre},</p>
+        <p>Te escribimos para recordarte que el plazo de entrega del concurso "La fachada como espacio y como envolvente" es el viernes 14 de marzo.</p>
+
+        <p><a href="https://asnnoise.com.ar/la-fachada-como-espacio-y-como-envolvente/">En el blog de asn/Noise se publicaron las respuestas a las consultas formuladas.</a> Podés leerlas en el comentario a la entrada del concurso </p>
+
+        <p>Estamos entusiasmados por ver tu propuesta</p>
+
+        <p>Cuando la tengas lista, compilá todas las láminas en un único PDF, que no supere los 25 mb, y mándalo por mail a esta dirección (hola@asnnoise.com.ar)</p>
+
+        <p>Saludos!</p>
+        <p>Equipo asn/Noise - Aisenson Arquitectos </p>`;
+
+      // Log email details instead of sending
+      Logger.log("Email #" + (index + 1) + ":");
+      Logger.log("  To: " + participant.correo);
+      Logger.log("  Subject: " + asunto);
+      Logger.log("  Name used: " + participant.nombre);
+      
+      // Optional: Log first few characters of HTML email
+      Logger.log("  HTML preview: " + mensajeHTML.substring(0, 50) + "...");
+    });
+    
+    // Simulate delay timing (but don't actually delay in test mode)
+    if (i + batchSize < recipients.length) {
+      var delay = Math.floor(Math.random() * (5 - 1 + 1) + 1);
+      Logger.log("Would wait " + delay + " minutes before next batch");
+    }
+  }
+  
+  Logger.log("TEST COMPLETE - No emails were actually sent");
+}
